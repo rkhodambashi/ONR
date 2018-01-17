@@ -24,7 +24,7 @@ function varargout = ONR_testSetupGUI(varargin)
 
 % Edit the above text to modify the response to help ONR_testSetupGUI
 
-% Last Modified by GUIDE v2.5 15-Jan-2018 13:08:56
+% Last Modified by GUIDE v2.5 16-Jan-2018 16:35:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -82,7 +82,7 @@ value = get(handles.Select_tempSensorCOM,'Value');
 % contents = cellstr(get(hObject,'String'));
 selectedTempComPort = contents(value); %returns selected item from Select_forceSensorCOM
 remainingComports2 = ports(string(ports)~=selectedTempComPort);
-set(handles.Select_forceSensorCOM,'String',remainingComports2);
+set(handles.Select_forceSensorCOM,'String',remainingComports1);
 
 contents = get(handles.Select_forceSensorCOM,'String');
 value = get(handles.Select_forceSensorCOM,'Value');
@@ -90,7 +90,7 @@ selectedForceComPort = contents(value); %returns selected item from Select_force
 % contents = cellstr(get(hObject.Select_tempSensorCOM,'String'));
 % selectedForceComPort = contents{get(hObject,'Value')}; %returns selected item from Select_forceSensorCOM
 remainingComports3 = remainingComports2(string(remainingComports2)~=selectedForceComPort);
-set(handles.Select_MotorCOM,'String',remainingComports3);
+set(handles.Select_MotorCOM,'String',remainingComports1);
 
 %set(handles.text1,'String',num2str(numConnectedCameras));
 %end
@@ -234,6 +234,10 @@ selectedMotorComPort = contents(value); %returns selected item from Select_force
 motor = serial(selectedMotorComPort, 'BaudRate', 115200, 'DataBits',8);
 set(motor,'InputBufferSize', INPUTBUFFER);  
 fopen(motor);          %opens the serial port
+%fscanf(thermocouple);
+if (isvalid([thermocouple, forcesensor, motor]))
+    set(handles.status,'String',"Success");
+end
 
 % --- Executes on button press in startStopTemp.
 function startStopTemp_Callback(hObject, eventdata, handles)
@@ -242,19 +246,20 @@ function startStopTemp_Callback(hObject, eventdata, handles)
     % and user data (see GUIDATA)
 
     % Hint: get(hObject,'Value') returns toggle state of startStopTemp
+    global number;
+    global startTime;
+    global fid;
+    global mData;
+    global t;
+    h1 = animatedline;
+    h2 = animatedline;
+    
     
     if(get(hObject,'Value'))
         %send a code to arduino that indicates the start of motor in a certain
         %direction this code should include the number from the slider that
         %shows the goal position of the motor
-        fscanf(forceSensor)
-    
-        global number;
-        global startTime;
-        global fid;
-        global mData;
-        global t;
-
+        %fscanf(forceSensor)
         while(number<15000)
         %query the temperature
         temperature = (fscanf(thermocouple));
@@ -271,9 +276,17 @@ function startStopTemp_Callback(hObject, eventdata, handles)
         axisTime = datetime('now') - startTime; 
         %%============================================= Draw animatedline
         % Add points to animation
-        addpoints(h,datenum(axisTime),mData(1))
+        axes(handles.axes1);
+        addpoints(h1,datenum(axisTime),mData(1))
         % Update axes
-        ax.XLim = datenum([axisTime-seconds(15) axisTime]);
+        tempGraph.XLim = datenum([axisTime-seconds(15) axisTime]);
+        datetick('x','keeplimits')
+        drawnow
+        
+        axes(handles.axes2);
+        addpoints(h2,datenum(axisTime),mData(1))
+        % Update axes
+        forceGraph.XLim = datenum([axisTime-seconds(15) axisTime]);
         datetick('x','keeplimits')
         drawnow
         %%==============================================
@@ -283,3 +296,10 @@ function startStopTemp_Callback(hObject, eventdata, handles)
         end
     end
 % --- Executes stream button press in OFF.
+
+
+% --- Executes during object creation, after setting all properties.
+function status_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to status (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
