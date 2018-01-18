@@ -213,31 +213,9 @@ function Open_Ports_Callback(hObject, eventdata, handles)
 % hObject    handle to Open_Ports (see GCBO) eventdata  reserved - to be
 % defined in a future version of MATLAB handles    structure with handles
 % and user data (see GUIDATA)
-global INPUTBUFFER
-contents = get(handles.Select_tempSensorCOM,'String');
-value = get(handles.Select_tempSensorCOM,'Value');
-selectedTempComPort = contents(value); %returns selected item from Select_tempSensorCOM
-thermocouple = serial(selectedTempComPort, 'BaudRate', 115200, 'DataBits',8);
-set(thermocouple,'InputBufferSize', INPUTBUFFER);  
-fopen(thermocouple);          %opens the serial port
 
-contents = get(handles.Select_forceSensorCOM,'String');
-value = get(handles.Select_forceSensorCOM,'Value');
-selectedForceComPort = contents(value); %returns selected item from Select_forceSensorCOM
-forcesensor = serial(selectedForceComPort, 'BaudRate', 115200, 'DataBits',8);
-set(forcesensor,'InputBufferSize', INPUTBUFFER);  
-fopen(forcesensor);          %opens the serial port
-
-contents = get(handles.Select_MotorCOM,'String');
-value = get(handles.Select_MotorCOM,'Value');
-selectedMotorComPort = contents(value); %returns selected item from Select_forceSensorCOM
-motor = serial(selectedMotorComPort, 'BaudRate', 115200, 'DataBits',8);
-set(motor,'InputBufferSize', INPUTBUFFER);  
-fopen(motor);          %opens the serial port
 %fscanf(thermocouple);
-if (isvalid([thermocouple, forcesensor, motor]))
-    set(handles.status,'String',"Success");
-end
+
 
 % --- Executes on button press in startStopTemp.
 function startStopTemp_Callback(hObject, eventdata, handles)
@@ -246,6 +224,7 @@ function startStopTemp_Callback(hObject, eventdata, handles)
     % and user data (see GUIDATA)
 
     % Hint: get(hObject,'Value') returns toggle state of startStopTemp
+    global INPUTBUFFER
     global number;
     global startTime;
     global fid;
@@ -253,48 +232,77 @@ function startStopTemp_Callback(hObject, eventdata, handles)
     global t;
     h1 = animatedline;
     h2 = animatedline;
+    contents = get(handles.Select_tempSensorCOM,'String');
+    value = get(handles.Select_tempSensorCOM,'Value');
+    selectedTempComPort = contents(value); %returns selected item from Select_tempSensorCOM
+    thermocouple = serial(selectedTempComPort, 'BaudRate', 115200, 'DataBits',8);
+    set(thermocouple,'InputBufferSize', INPUTBUFFER);
+    fopen(thermocouple);          %opens the serial port
     
+    contents = get(handles.Select_forceSensorCOM,'String');
+    value = get(handles.Select_forceSensorCOM,'Value');
+    selectedForceComPort = contents(value); %returns selected item from Select_forceSensorCOM
+    forcesensor = serial(selectedForceComPort, 'BaudRate', 115200, 'DataBits',8);
+    set(forcesensor,'InputBufferSize', INPUTBUFFER);
+    %fopen(forcesensor);          %opens the serial port
     
-    if(get(hObject,'Value'))
+    contents = get(handles.Select_MotorCOM,'String');
+    value = get(handles.Select_MotorCOM,'Value');
+    selectedMotorComPort = contents(value); %returns selected item from Select_forceSensorCOM
+    motor = serial(selectedMotorComPort, 'BaudRate', 115200, 'DataBits',8);
+    set(motor,'InputBufferSize', INPUTBUFFER);
+    %fopen(motor);          %opens the serial port
+    
+    if (isvalid([thermocouple, forcesensor, motor]))
+        set(handles.status,'String',"Success");
+    end
+    
+    %if(get(hObject,'Value'))
+        
+        
+        
         %send a code to arduino that indicates the start of motor in a certain
         %direction this code should include the number from the slider that
         %shows the goal position of the motor
         %fscanf(forceSensor)
-        while(number<15000)
+%         while(number<15000)
+        while(get(hObject,'Value'))
         %query the temperature
         temperature = (fscanf(thermocouple));
         temperature = strsplit(temperature,' '); % same character as the Arduino code
         mData(1) = str2double(temperature(1)); 
         % query the force sensor
-        fprintf(forceSensor,'?');
-        fprintf(forceSensor,'CR/LF');
-        data = (fscanf(forceSensor));
-        force = strsplit(data,' '); % same character as the Arduino code
-        mData(2) = str2double(force(1)); 
+%         fprintf(forcesensor,'?');
+%         fprintf(forcesensor,'CR/LF');
+%         data = (fscanf(forcesensor));
+%         force = strsplit(data,' '); % same character as the Arduino code
+       % mData(2) = str2double(force(1)); 
         % Get current time
         t =  second(datetime('now')) - second(startTime); 
         axisTime = datetime('now') - startTime; 
         %%============================================= Draw animatedline
         % Add points to animation
-        axes(handles.axes1);
+        %axes(handles.axes1);
         addpoints(h1,datenum(axisTime),mData(1))
         % Update axes
         tempGraph.XLim = datenum([axisTime-seconds(15) axisTime]);
         datetick('x','keeplimits')
         drawnow
         
-        axes(handles.axes2);
-        addpoints(h2,datenum(axisTime),mData(1))
-        % Update axes
-        forceGraph.XLim = datenum([axisTime-seconds(15) axisTime]);
-        datetick('x','keeplimits')
-        drawnow
+        %axes(handles.axes2);
+%         addpoints(h2,datenum(axisTime),mData(2))
+%         % Update axes
+%         forceGraph.XLim = datenum([axisTime-seconds(15) axisTime]);
+%         datetick('x','keeplimits')
+%         drawnow
         %%==============================================
         number = number+1;
-        fprintf(fid, '%f %f %f \n', t,mData(1),mData(2));
+        fprintf(fid, '%f %f %f \n', t,mData(1),mData(1));
         pause(.001)
         end
-    end
+%     else
+%         delete(instrfindall);
+%     end
 % --- Executes stream button press in OFF.
 
 
