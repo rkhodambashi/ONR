@@ -4,9 +4,13 @@
 Adafruit_MAX31856 max = Adafruit_MAX31856(10, 11, 12, 13);
 // use hardware SPI, just pass in the CS pin
 //Adafruit_MAX31856 max = Adafruit_MAX31856(10);
-
+//char force;
+float temp;
+byte force[8];
 void setup() {
   Serial.begin(115200);
+  Serial1.begin(115200);
+
   //Serial.println("MAX31856 thermocouple test");
 
   max.begin();
@@ -35,7 +39,19 @@ void loop() {
   //Serial.print("Cold Junction Temp: "); Serial.println(max.readCJTemperature());
 
   // Serial.print("Thermocouple Temp: "); 
-  Serial.println(max.readThermocoupleTemperature());
+  //Serial.println(max.readThermocoupleTemperature());
+  Serial1.write('?');
+  Serial1.write('\r');
+  Serial1.write('\n');
+  //Serial.println(Serial1.read());
+  //Serial1.print('CR/LF');
+  Serial1.readBytes(force,4);
+  //force = strtok(force," ");
+  temp = max.readThermocoupleTemperature();
+  Serial.println(force[1]);
+  Serial.println(force[2]);
+  Serial.println(temp);
+  
   // Check and print any faults
 //  uint8_t fault = max.readFault();
 //  if (fault) {
@@ -48,5 +64,5 @@ void loop() {
 //    if (fault & MAX31856_FAULT_OVUV)    Serial.println("Over/Under Voltage Fault");
 //    if (fault & MAX31856_FAULT_OPEN)    Serial.println("Thermocouple Open Fault");
 //  }
-  delay(10);
+  delay(100);
 }
