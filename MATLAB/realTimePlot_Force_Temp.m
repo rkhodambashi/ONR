@@ -5,7 +5,7 @@
 %%rkhodamb@asu.edu
 
 close all;          % close all figures
-clear;          % clear all workspace variables
+clear;            % clear all w orkspace variables
 clc;                % clear the command line
 fclose('all');      % close all open files
 delete(instrfindall);   % Reset Com Port
@@ -14,10 +14,10 @@ INPUTBUFFER = 512;
 
 %% Create a serial object
 forceSensor = serial('COM9', 'BaudRate', 115200, 'DataBits',8);  
-c = serial('COM4', 'BaudRate', 115200, 'DataBits',8); 
+thermocouple = serial('COM4', 'BaudRate', 115200, 'DataBits',8); 
 % Set serial port buffer 
 set(forceSensor,'InputBufferSize', INPUTBUFFER);             
-forceSensor.Terminator = 'CR/LF';
+forceSensor.Terminator = 'CR';
 fopen(forceSensor);          %opens the serial port
 set(thermocouple,'InputBufferSize', INPUTBUFFER);             
 fopen(thermocouple);          %opens the serial port
@@ -35,19 +35,21 @@ header3 = 'Force';
 fid = fopen('timeTempForce.txt','w');
 fprintf(fid, [ header1 '     ' header2 '     ' header3 '\n']);
 mData = [];
-while(number<15000)
+while(number<150000)
 %query the temperature
 temperature = (fscanf(thermocouple));
 temperature = strsplit(temperature,' '); % same character as the Arduino code
 mData(1) = str2double(temperature(1)); 
 % query the force sensor
 fprintf(forceSensor,'?');
-fprintf(forceSensor,'CR/LF');
 data = (fscanf(forceSensor));
 force = strsplit(data,' '); % same character as the Arduino code
 mData(2) = str2double(force(1)); 
 % Get current time
-t =  second(datetime('now')) - second(startTime); 
+% t =  second(datetime('now')) - second(startTime); 
+t =  (datetime('now')) - (startTime); 
+% t = int32(hours(t))*60*60+int32(minutes(t))*60+seconds(t);
+t = seconds(t);
 axisTime = datetime('now') - startTime; 
 %%=============================================
 %%Draw animatedline       
@@ -60,7 +62,7 @@ drawnow
 %%==============================================   
 number = number+1;
 fprintf(fid, '%f %f %f \n', t,mData(1),mData(2));
-pause(.001)
+pause(0.2)
 end
 fclose(fid);
 fclose(forceSensor); %close the serial port
