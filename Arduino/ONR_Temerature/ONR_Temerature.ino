@@ -7,6 +7,8 @@ Adafruit_MAX31856 max = Adafruit_MAX31856(10, 11, 12, 13);
 //char force;
 float temp;
 byte force[8];
+const int heater  =  8;
+const int fan  =  6;
 void setup() {
   Serial.begin(115200);
   //Serial.println("MAX31856 thermocouple test");
@@ -14,8 +16,8 @@ void setup() {
   max.begin();
 
   max.setThermocoupleType(MAX31856_TCTYPE_K);
-pinMode(8,OUTPUT);//heater
-pinMode(6,OUTPUT);//fan
+pinMode(heater,OUTPUT);//heater
+pinMode(fan,OUTPUT);//fan
 //  Serial.print("Thermocouple type: ");
 //  switch ( max.getThermocoupleType() ) {
 //    case MAX31856_TCTYPE_B: Serial.println("B Type"); break;
@@ -33,14 +35,14 @@ pinMode(6,OUTPUT);//fan
 
 
 }
-float temp;
 int delayTime = 1000;
 boolean highLow = 0;
 int minutesHigh = 20;
-int minutesLow = 20;
+int minutesLow = 60;
 int highTemp = 36;
 int lowTemp = 28;
 int firstRun =1;
+float deltaT = 0.5;
 void loop() {
   //Serial.print("Cold Junction Temp: "); Serial.println(max.readCJTemperature());
   
@@ -62,15 +64,17 @@ void loop() {
 //       Serial.print("i: ");
 //       Serial.println(i);
         if(temp>highTemp){
-          digitalWrite(8,LOW);
+          digitalWrite(heater,LOW);
+          digitalWrite(fan,HIGH);
         }
-        if(temp<highTemp-1){
-          digitalWrite(8,HIGH);
+        if(temp<highTemp-deltaT){
+          digitalWrite(heater,HIGH);
+          digitalWrite(fan,LOW);
         }
       }
       highLow = 1;
       firstRun =0;
-      digitalWrite(6,HIGH);
+      digitalWrite(fan,HIGH);
     }
  // }
   //if (temp <lowTemp-1){
@@ -84,17 +88,18 @@ void loop() {
 //        Serial.print("j: ");
 //        Serial.println(j);
         if(temp>lowTemp){
-          digitalWrite(8,LOW);
+          digitalWrite(heater,LOW);
+          digitalWrite(fan,HIGH);
         }
-        if(temp<lowTemp-1){
-          digitalWrite(8,HIGH);
-          digitalWrite(6,LOW);
+        if(temp<lowTemp-deltaT){
+          digitalWrite(heater,HIGH);
+          digitalWrite(fan,LOW);
         }
       }
     }
     highLow = 0;
     firstRun =0;
-    digitalWrite(6,LOW);
+    digitalWrite(fan,LOW);
  // }
   // Check and print any faults
 //  uint8_t fault = max.readFault();
