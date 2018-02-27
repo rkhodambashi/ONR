@@ -24,14 +24,14 @@ pinMode(activatePeltier,OUTPUT);//enable pin
 pinMode(fan,OUTPUT);//fan
 }
 //===========================================================
-float delayTime = 1000;
+float delayTime = 200;
 boolean highLow = 0;
 int minutesHigh = 1;
 int minutesLow = 1;
 int highTemp = 36;
 int lowTemp = 28;
 
-float setTemp = 40;
+float setTemp = 36;
 char setTemp1;
 float currentTemp;
 float previousTemp;
@@ -44,8 +44,8 @@ float integralError =0;
 float drivativeError;
 
 float proportional = 50;
-float integral = 30;
-float drivative = 2;
+float integral = 0;
+float drivative = 200;
 
 
 float controlSignal = 0;

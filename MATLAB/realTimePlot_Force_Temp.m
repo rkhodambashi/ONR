@@ -13,8 +13,8 @@ delete(timerfindall);   % Delete Timers
 INPUTBUFFER = 512;
 
 %% Create a serial object
-forceSensor = serial('COM3', 'BaudRate', 115200, 'DataBits',8);  %com4 for lab pc, %com9 for laptop
-thermocouple = serial('COM4', 'BaudRate', 115200, 'DataBits',8); %com3 for lab pc, %com4 for laptop
+forceSensor = serial('COM4', 'BaudRate', 115200, 'DataBits',8);  %com4 for lab pc, %com9 for laptop
+thermocouple = serial('COM3', 'BaudRate', 115200, 'DataBits',8); %com3 for lab pc, %com4 for laptop
 % Set serial port buffer 
 set(forceSensor,'InputBufferSize', INPUTBUFFER);             
 forceSensor.Terminator = 'CR';
@@ -61,8 +61,8 @@ datetick('x','keeplimits')
 drawnow
 %%==============================================   
 number = number+1;
-fprintf(fid, '%f %f %f \n', t,mData(1),mData(1  ));
-pause(0.4)
+fprintf(fid, '%f %f %f \n', t,mData(1),mData(1));
+pause(0.1)
 end
 fclose(fid);
 fclose(forceSensor); %close the serial port
