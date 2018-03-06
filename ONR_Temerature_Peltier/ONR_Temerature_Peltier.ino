@@ -24,7 +24,7 @@ pinMode(activatePeltier,OUTPUT);//enable pin
 pinMode(fan,OUTPUT);//fan
 }
 //===========================================================
-float delayTime = 200;
+float delayTime = 50;
 float minutesHigh = 10;
 float timerOverflow;
 int sampleRateTimer = 0;
@@ -63,19 +63,19 @@ boolean heating =  HIGH;
 boolean cooling = LOW;
 //===========================================================
 void loop() {
-  timerOverflow = minutesHigh*60*1000/delayTime;
-  if (timer>timerOverflow && heating ==HIGH){
-    setTemp = 28;
-    heating = LOW;
-    cooling = HIGH;
-    timer = 0;
-  }
-  if (timer>timerOverflow && cooling ==HIGH){
-    setTemp = 36;
-    heating = HIGH;
-    cooling = LOW;
-    timer = 0;
-  }
+//  timerOverflow = minutesHigh*60*1000/delayTime;
+//  if (timer>timerOverflow && heating ==HIGH){
+//    setTemp = 28;
+//    heating = LOW;
+//    cooling = HIGH;
+//    timer = 0;
+//  }
+//  if (timer>timerOverflow && cooling ==HIGH){
+//    setTemp = 36;
+//    heating = HIGH;
+//    cooling = LOW;
+//    timer = 0;
+//  }
   //digitalWrite(activatePeltier,LOW);
   if (Serial.available()){
     setTemp = Serial.parseFloat();
@@ -123,11 +123,11 @@ void loop() {
 counter = counter+1;
 previousError = currentError;
 sampleRateTimer = sampleRateTimer+1;
-if (sampleRateTimer>=5){
-  Serial.println(currentTemp);
-  sampleRateTimer = 0;
-}
-//Serial.println(setTemp);
+//if (sampleRateTimer>=5){
+//  Serial.println(currentTemp);
+//  sampleRateTimer = 0;
+//}
+Serial.println(setTemp);
 //Serial.println(timerOverflow);
 
 //Serial.println(pwmRatio);
