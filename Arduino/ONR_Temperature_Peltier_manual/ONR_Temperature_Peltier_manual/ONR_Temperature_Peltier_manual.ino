@@ -1,15 +1,15 @@
 #include <Adafruit_MAX31856.h>
 
 // Use software SPI: CS, DI, DO, CLK
-Adafruit_MAX31856 max = Adafruit_MAX31856(10, 11, 12, 13);
+Adafruit_MAX31856 max = Adafruit_MAX31856(9,10, 11, 12);
 // use hardware SPI, just pass in the CS pin
 //Adafruit_MAX31856 max = Adafruit_MAX31856(10);
 //char force;
-
-const int heatUp  =  6;
+const int controlPin  =  4;
+const int heatUp  =  5;
+const int activatePeltier  =  6;//enable pin
 const int coolDown  =  7;
-const int activatePeltier  =  8;//enable pin
-const int fan  =  9;
+const int fan  =  8;
 //==========================================================
 void setup() {
   Serial.begin(115200);
@@ -18,6 +18,7 @@ void setup() {
   max.begin();
 
   max.setThermocoupleType(MAX31856_TCTYPE_K);
+pinMode(controlPin,INPUT);//direction pin  
 pinMode(heatUp,OUTPUT);//direction pin
 pinMode(coolDown,OUTPUT);//direction pin
 pinMode(activatePeltier,OUTPUT);//enable pin
@@ -46,7 +47,7 @@ float sigmaError[integratorLength]={0};
 float integralError =0;
 float drivativeError;
 
-float proportional = 50;
+float proportional = 200;
 float integral = 0;
 float drivative = 200;
 
@@ -77,10 +78,16 @@ void loop() {
 //    timer = 0;
 //  }
   //digitalWrite(activatePeltier,LOW);
-  if (Serial.available()){
-    setTemp = Serial.parseFloat();
-    //setTemp = atof(setTemp1);
-  }
+//  if (Serial.available()){
+//    setTemp = Serial.parseFloat();
+//    //setTemp = atof(setTemp1);
+//  }
+if (digitalRead(controlPin)==HIGH){
+  setTemp = 45;
+}
+if (digitalRead(controlPin)==LOW){
+  setTemp = 27;
+}
   //Serial.println(setTemp);
   //setTemp = Serial.read();
   currentTemp = max.readThermocoupleTemperature();
@@ -123,11 +130,11 @@ void loop() {
 counter = counter+1;
 previousError = currentError;
 sampleRateTimer = sampleRateTimer+1;
-//if (sampleRateTimer>=5){
-//  Serial.println(currentTemp);
-//  sampleRateTimer = 0;
-//}
-Serial.println(setTemp);
+if (sampleRateTimer>=5){
+  Serial.println(currentTemp);
+  sampleRateTimer = 0;
+}
+//Serial.println(setTemp);
 //Serial.println(timerOverflow);
 
 //Serial.println(pwmRatio);
