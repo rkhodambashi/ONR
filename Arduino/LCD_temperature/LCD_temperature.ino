@@ -146,7 +146,7 @@ void loop() {
 //}
 setTemp = analogRead(A3);
 setTemp = map(setTemp,0,1023,25,50);
-Serial.println(setTemp);
+//Serial.println(setTemp);
   //Serial.println(setTemp);
   //setTemp = Serial.read();
   currentTemp = max.readThermocoupleTemperature();
