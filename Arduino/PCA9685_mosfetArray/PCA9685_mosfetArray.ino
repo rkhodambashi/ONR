@@ -10,12 +10,22 @@
 #define Addr 0x40
 
 int mode = 0;
+int PWM_ratio = 0;//=  {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',};
+char PWM_ic;
+int PWM_channel = 0;
+int counter = 0;
+char seperator = ',';
+char input_char;
+int input_int;
+int input_data = 0;
+int k = -1;
 void setup()
 {
   // Initialise I2C communication as MASTER
   Wire.begin();
+  Wire.setClock(400000);
   // Initialise Serial Communication, Baud rate = 9600
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   // Start I2C Transmission
   Wire.beginTransmission(Addr);
@@ -61,14 +71,14 @@ void setup()
   // Stop I2C Transmission
   Wire.endTransmission();
 
-//  // Start I2C Transmission
-//  Wire.beginTransmission(Addr);
-//  // Select PRE_SCALE register
-//  Wire.write(0xFE);
-//  // Set prescale frequency to 60 Hz
-//  Wire.write(0x65);
-//  // Stop I2C Transmission
-//  Wire.endTransmission();
+  //  // Start I2C Transmission
+  //  Wire.beginTransmission(Addr);
+  //  // Select PRE_SCALE register
+  //  Wire.write(0xFE);
+  //  // Set prescale frequency to 60 Hz
+  //  Wire.write(0x65);
+  //  // Stop I2C Transmission
+  //  Wire.endTransmission();
 
   // Start I2C Transmission
   Wire.beginTransmission(Addr);
@@ -92,90 +102,126 @@ void setup()
 
 void loop()
 {
-  // Increase Brightness of ALL LED
-  for (int i = 0; i < 4096; i += 3)
-  {
-    // Start I2C Transmission
-    Wire.beginTransmission(Addr);
-    // Select ALL_LED_ON_L register
-    Wire.write(0x06);
-    // ALL_LED_ON lower byte
-    Wire.write(0);
-    // Stop I2C Transmission
-    Wire.endTransmission();
-    
-    // Start I2C Transmission
-    Wire.beginTransmission(Addr);
-    // Select ALL_LED_ON_H register
-    Wire.write(0x07);
-    // ALL_LED_ON higher byte
-    Wire.write(0x00);
-    // Stop I2C Transmission
-    Wire.endTransmission();
-    
-    
-    // Start I2C Transmission
-    Wire.beginTransmission(Addr);
-    // Select ALL_LED_OFF_L register
-    Wire.write(0x08);
-    // ALL_LED_OFF lower byte
-    Wire.write(255);//this goes from 0 to 255
-    
-    // Stop I2C Transmission
-    Wire.endTransmission();
-    
-    // Start I2C Transmission
-    Wire.beginTransmission(Addr);
-    // Select ALL_LED_OFF_H register
-    Wire.write(0x09);
-    // ALL_LED_OFF higher byte
-    Wire.write(0);//this goes from 0 to 16
-    // Stop I2C Transmission
-    Wire.endTransmission();
+  while (Serial.available()) {
+    input_char = Serial.read();
+    if (input_char == seperator)
+    {
+      k = k * -1;
+      if (k == -1)
+      {
+      PWM_ratio = input_data;
+      }
+      if (k==1)
+      {
+      PWM_channel = input_data;
+      }
+      input_data = 0;
+    }
+    else
+    {
+      input_int = input_char - '0';
+      //    Serial.println(input_int);
+      input_data = input_data * 10;
+      input_data = input_data + input_int;
+    }
+//    PWM_channel = 3;
   }
-  delay(2500);
-//
-//  // Decrease Brightness of ALL LED
-//  for(int i = 4095; i >= 0; i -= 3)
-//  {
-//    // Start I2C Transmission
-//    Wire.beginTransmission(Addr);
-//    // Select ALL_LED_ON_L register
-//    Wire.write(0xFA);
-//    // ALL_LED_ON lower byte
-//    Wire.write(0x00);
-//    // Stop I2C Transmission
-//    Wire.endTransmission();
-//    
-//    // Start I2C Transmission
-//    Wire.beginTransmission(Addr);
-//    // Select ALL_LED_ON_H register
-//    Wire.write(0xFB);
-//    // ALL_LED_ON higher byte
-//    Wire.write(0x00);
-//    // Stop I2C Transmission
-//    Wire.endTransmission();
-//    
-//    
-//    // Start I2C Transmission
-//    Wire.beginTransmission(Addr);
-//    // Select ALL_LED_OFF_L register
-//    Wire.write(0xFC);
-//    // ALL_LED_OFF lower byte
-//    Wire.write((byte)(i & 0xFF));
-//    
-//    // Stop I2C Transmission
-//    Wire.endTransmission();
-//    
-//    // Start I2C Transmission
-//    Wire.beginTransmission(Addr);
-//    // Select ALL_LED_OFF_H register
-//    Wire.write(0xFD);
-//    // ALL_LED_OFF higher byte
-//    Wire.write((i >> 8));
-//    // Stop I2C Transmission
-//    Wire.endTransmission();
-//  }
-//  delay(2500);  
+      
+//      Serial.println(PWM_ratio);
+
+  //PWM_ratio = PWM_ratio+10;
+  //PWM_channel = 3;
+  //Serial.println(PWM_channel+5);
+  counter = 0;
+  //  for (int i = 6; i < 69; i += 4)
+  //  {
+  //Serial.println(((PWM_string)));
+  //Serial.println(PWM_string[counter]>>8);
+  // Start I2C Transmission
+  Wire.beginTransmission(Addr);
+  // Select LEDn_ON_L register
+  //Wire.write(i);
+
+  Wire.write(4 * PWM_channel + 2);
+  //LEDn_ON lower byte
+  Wire.write(0);//on starts at time 0 (no delay)
+  // Stop I2C Transmission
+  Wire.endTransmission();
+
+  // Start I2C Transmission
+  Wire.beginTransmission(Addr);
+  // Select ALL_LED_ON_H register
+  Wire.write(4 * PWM_channel + 3);
+  // ALL_LED_ON higher byte
+  Wire.write(0);//on starts at time 0 (no delay)
+  // Stop I2C Transmission
+  Wire.endTransmission();
+
+
+  // Start I2C Transmission
+  Wire.beginTransmission(Addr);
+  // Select ALL_LED_OFF_L register
+  Wire.write(4 * PWM_channel + 4);
+  // ALL_LED_OFF lower byte
+  Wire.write((PWM_ratio & 0xFF));//this goes from 0 to 255
+
+  // Stop I2C Transmission
+  Wire.endTransmission();
+
+  // Start I2C Transmission
+  Wire.beginTransmission(Addr);
+  // Select ALL_LED_OFF_H register
+  Wire.write(4 * PWM_channel + 5);
+  // ALL_LED_OFF higher byte
+  Wire.write(PWM_ratio >> 8); //this goes from 0 to 16
+  // Stop I2C Transmission
+  Wire.endTransmission();
+
+  //    counter+=1;
+  //  }
+  //delay(1000);
+  //
+  //  // Decrease Brightness of ALL LED
+  //  for(int i = 4095; i >= 0; i -= 3)
+  //  {
+  //    // Start I2C Transmission
+  //    Wire.beginTransmission(Addr);
+  //    // Select ALL_LED_ON_L register
+  //    Wire.write(0xFA);
+  //    // ALL_LED_ON lower byte
+  //    Wire.write(0x00);
+  //    // Stop I2C Transmission
+  //    Wire.endTransmission();
+  //
+  //    // Start I2C Transmission
+  //    Wire.beginTransmission(Addr);
+  //    // Select ALL_LED_ON_H register
+  //    Wire.write(0xFB);
+  //    // ALL_LED_ON higher byte
+  //    Wire.write(0x00);
+  //    // Stop I2C Transmission
+  //    Wire.endTransmission();
+  //
+  //
+  //    // Start I2C Transmission
+  //    Wire.beginTransmission(Addr);
+  //    // Select ALL_LED_OFF_L register
+  //    Wire.write(0xFC);
+  //    // ALL_LED_OFF lower byte
+  //    Wire.write((byte)(i & 0xFF));
+  //
+  //    // Stop I2C Transmission
+  //    Wire.endTransmission();
+  //
+  //    // Start I2C Transmission
+  //    Wire.beginTransmission(Addr);
+  //    // Select ALL_LED_OFF_H register
+  //    Wire.write(0xFD);
+  //    // ALL_LED_OFF higher byte
+  //    Wire.write((i >> 8));
+  //    // Stop I2C Transmission
+  //    Wire.endTransmission();
+   // }
+  //  delay(5);
 }
 
