@@ -7,7 +7,7 @@ Created on Tue Jun 26 10:44:23 2018
 
 import serial
 import time
-ser = serial.Serial('COM9', baudrate=115200, bytesize =8)
+ser = serial.Serial('COM3', baudrate=115200, bytesize =8)
 print(ser.name) 
 time.sleep(5)
 

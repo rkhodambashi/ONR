@@ -145,7 +145,7 @@ void loop() {
 //  setTemp = 27;
 //}
 setTemp = analogRead(A3);
-setTemp = map(setTemp,0,1023,25,50);
+setTemp = map(setTemp,0,1023,15,50);
 //Serial.println(setTemp);
   //Serial.println(setTemp);
   //setTemp = Serial.read();
