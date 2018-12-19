@@ -59,7 +59,8 @@ addpoints(h,datenum(axisTime),mData(1))
 ax.XLim = datenum([axisTime-seconds(15) axisTime]);
 datetick('x','keeplimits')
 drawnow
-%%==============================================   
+%%==============================================  
+%ghgnjgkgkh
 number = number+1;
 fprintf(fid, '%f %f %f \n', t,mData(1));
 pause(0.1)
