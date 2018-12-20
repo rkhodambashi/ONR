@@ -45,7 +45,7 @@ imshow(firstFrame);
 f = figure(1);
 start = uicontrol(f,'style','pushbutton','String', 'Start','Callback',@stopf, 'position',[100 0 100 25]);
 stop = uicontrol(f,'style','pushbutton','String', 'Stop','Callback',@stopf, 'position',[0 0 100 25]);
-
+tic;
 while ishandle(stop) && ishandle(start)
 %         frame = read(v,numFrame);
         videoFrame = getsnapshot(vidobj);
