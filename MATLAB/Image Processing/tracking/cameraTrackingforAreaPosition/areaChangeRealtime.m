@@ -13,13 +13,13 @@ start(vidobj);
 % writer.Quality = 95;
 % writer.FrameRate = 30;
 
-% v = VideoReader('video4.mov');
+% v = VideoReader('video5.mov');
 
 num = 1;
 sizeControl = 0.80;
 count = 1;
-% numFrame = 1;
-
+numFrame = 1;
+mode =2;
 % open(writer);
 f = figure(1);
 takePicture = uicontrol(f,'style','pushbutton','String', 'Take','Callback',@stopf, 'position',[0 0 100 25]);
@@ -34,7 +34,7 @@ f = figure(1);
 firstFrame = previewFrame;
 k  = readDistance;
 [~,RECT] = imcrop(firstFrame);
-[stats,ori]= pointTracking(firstFrame,RECT,0);
+[stats,ori]= pointTracking(firstFrame,RECT,0,mode);
 
 sortedArea = sort(stats.Area,'descend');
 filiterSize = ceil(sizeControl*sortedArea(1));
@@ -46,10 +46,11 @@ f = figure(1);
 start = uicontrol(f,'style','pushbutton','String', 'Start','Callback',@stopf, 'position',[100 0 100 25]);
 stop = uicontrol(f,'style','pushbutton','String', 'Stop','Callback',@stopf, 'position',[0 0 100 25]);
 tic;
+
 while ishandle(stop) && ishandle(start)
-%         frame = read(v,numFrame);
+%         videoFrame = read(v,numFrame);
         videoFrame = getsnapshot(vidobj);
-        [stats,frame2]= pointTracking(videoFrame,RECT,filiterSize);
+        [stats,frame2]= pointTracking(videoFrame,RECT,filiterSize,mode);
         [position,count] = propertyTransformation(stats,RECT,count,num);
 		
         if position.Status == 1
@@ -64,12 +65,12 @@ end
 tic;
 areaData = zeros(num+1,1000000);
 positionData= zeros(num+2,1000000);
-
+count = 1;
 % while ~isDone(obj.videoPlayer) && ishandle(stop)
 while ishandle(stop)
-%         frame = read(v,numFrame);
+%         videoFrame = read(v,numFrame);
         videoFrame = getsnapshot(vidobj);
-        [stats,frame2]= pointTracking(videoFrame,RECT,filiterSize);
+        [stats,frame2]= pointTracking(videoFrame,RECT,filiterSize,mode);
         [position,count] = propertyTransformation(stats,RECT,count,num);
         
         if position.Status == 1
