@@ -8,13 +8,13 @@ obj.resultPlayer = vision.VideoPlayer;
 vidobj = videoinput('winvideo',2);
 triggerconfig(vidobj, 'manual');
 start(vidobj);
+a=arduino();
 
 % writer= VideoWriter('testVideo.avi');
 % writer.Quality = 95;
 % writer.FrameRate = 30;
 
 % v = VideoReader('video5.mov');
-
 num = 1;
 sizeControl = 0.80;
 count = 1;
@@ -81,7 +81,12 @@ while ishandle(stop)
             frame = markFrame([],[],RECT,videoFrame);
         end
         step(obj.videoPlayer,frame);
-        step(obj.resultPlayer,frame2);		
+        step(obj.resultPlayer,frame2);	
+        if position.Centroid(1)<480
+            writePWMVoltage(a,'D2',0);
+        else
+            writePWMVoltage(a,'D2',5);
+        end
 end
 
 % close(writer);
