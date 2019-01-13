@@ -20,6 +20,8 @@ sizeControl = 0.80;
 count = 1;
 numFrame = 1;
 mode =2;
+heatingTime = 10;
+coolingTime = 60;
 % open(writer);
 f = figure(1);
 takePicture = uicontrol(f,'style','pushbutton','String', 'Take','Callback',@stopf, 'position',[0 0 100 25]);
@@ -46,7 +48,8 @@ f = figure(1);
 start = uicontrol(f,'style','pushbutton','String', 'Start','Callback',@stopf, 'position',[100 0 100 25]);
 stop = uicontrol(f,'style','pushbutton','String', 'Stop','Callback',@stopf, 'position',[0 0 100 25]);
 tic;
-
+%send cooling time
+%
 while ishandle(stop) && ishandle(start)
 %         videoFrame = read(v,numFrame);
         videoFrame = getsnapshot(vidobj);
@@ -66,17 +69,22 @@ tic;
 areaData = zeros(num+1,1000000);
 positionData= zeros(num+2,1000000);
 count = 1;
+num = 1;
+
 % while ~isDone(obj.videoPlayer) && ishandle(stop)
 while ishandle(stop)
 %         videoFrame = read(v,numFrame);
+        if num ==1
+            %start hearting
+        end
         videoFrame = getsnapshot(vidobj);
         [stats,frame2]= pointTracking(videoFrame,RECT,filiterSize,mode);
         [position,count] = propertyTransformation(stats,RECT,count,num);
-        
         if position.Status == 1
         frame = markFrame(position.Centroid,position.Bbox,RECT,videoFrame);
         areaData(1:num+1,count) = [position.Area(1:num);position.Time(1)];
 		positionData(1:num+2,count) = [position.Centroid';position.Time(1)];
+        angle(count) = angleCalculate(RECT, position, testData, counts)
         else
             frame = markFrame([],[],RECT,videoFrame);
         end

@@ -42,7 +42,7 @@ stop = uicontrol(f,'style','pushbutton','String', 'Stop','Callback',@stopf, 'pos
 sortedArea = sort(stats.Area,'descend');
 filiterSize = ceil(sizeControl*sortedArea(1));
 
-imshow(firstFrame)
+imshow(firstFrame);
 [trackingRegion,RECT] = imcrop(firstFrame);
 
 while ishandle(stop) && ishandle(start)
@@ -63,7 +63,7 @@ end
 tic;
 areaData = zeros(num+1,1000000);
 positionData= zeros(num+2,1000000);
-
+count =1;
 % while ~isDone(obj.videoPlayer) && ishandle(stop)
 while ishandle(stop)
 %         frame = read(v,numFrame);
